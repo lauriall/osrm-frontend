@@ -145,6 +145,7 @@ var controlOptions = {
   showAlternatives: options.lrm.showAlternatives,
   units: mergedOptions.units,
   serviceUrl: leafletOptions.services[0].path,
+  apiKey: leafletOptions.apiKey || null,
   useZoomParameter: options.lrm.useZoomParameter,
   routeDragInterval: options.lrm.routeDragInterval,
   collapsible: options.lrm.collapsible
@@ -169,6 +170,38 @@ router._convertRoute = function(responseRoute) {
 
   return resp;
 };
+router.buildRouteUrl = function(waypoints, options) {
+  var locs = [],
+    hints = [],
+    wp,
+    latLng,
+    computeInstructions,
+    computeAlternative = true;
+
+  for (var i = 0; i < waypoints.length; i++) {
+    wp = waypoints[i];
+    latLng = wp.latLng;
+    locs.push(latLng.lng + ',' + latLng.lat);
+    hints.push(this._hints.locations[this._locationKey(latLng)] || '');
+  }
+
+  computeInstructions =
+    !(options && options.geometryOnly);
+
+  var route = this.options.serviceUrl + '/' + this.options.profile + '/' +
+    locs.join(';') + '?' +
+    (options.geometryOnly ? (options.simplifyGeometry ? '' : 'overview=full') : 'overview=false') +
+    '&alternatives=' + computeAlternative.toString() +
+    '&steps=' + computeInstructions.toString() +
+    (this.options.useHints ? '&hints=' + hints.join(';') : '') +
+    (options.allowUTurns ? '&continue_straight=' + !options.allowUTurns : '');
+
+  console.log(!!this.options.apiKey);
+  console.log(this.options.apiKey);
+
+  return !!this.options.apiKey ? route +  "&apiKey=" + this.options.apiKey : route;
+};
+
 var lrmControl = L.Routing.control(Object.assign(controlOptions, {
   router: router
 })).addTo(map);
