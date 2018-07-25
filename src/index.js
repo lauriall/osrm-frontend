@@ -145,11 +145,11 @@ var controlOptions = {
   showAlternatives: options.lrm.showAlternatives,
   units: mergedOptions.units,
   serviceUrl: leafletOptions.services[0].path,
-  apiKey: leafletOptions.apiKey || null,
   useZoomParameter: options.lrm.useZoomParameter,
   routeDragInterval: options.lrm.routeDragInterval,
   collapsible: options.lrm.collapsible
 };
+
 var router = (new L.Routing.OSRMv1(controlOptions));
 router._convertRouteOriginal = router._convertRoute;
 router._convertRoute = function(responseRoute) {
@@ -192,14 +192,11 @@ router.buildRouteUrl = function(waypoints, options) {
     locs.join(';') + '?' +
     (options.geometryOnly ? (options.simplifyGeometry ? '' : 'overview=full') : 'overview=false') +
     '&alternatives=' + computeAlternative.toString() +
-    '&steps=' + computeInstructions.toString() +
+    '&steps=' + computeInstructions.toStrking() +
     (this.options.useHints ? '&hints=' + hints.join(';') : '') +
     (options.allowUTurns ? '&continue_straight=' + !options.allowUTurns : '');
-
-  console.log(!!this.options.apiKey);
-  console.log(this.options.apiKey);
-
-  return !!this.options.apiKey ? route +  "&apiKey=" + this.options.apiKey : route;
+  return (!!leafletOptions.apiKey && leafletOptions.apiKey !== 'null')
+    ? route +  "&apikey=" + leafletOptions.apiKey : route;
 };
 
 var lrmControl = L.Routing.control(Object.assign(controlOptions, {

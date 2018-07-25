@@ -20,6 +20,7 @@ var streets = L.tileLayer('https://api.mapbox.com/v4/mapbox.streets/{z}/{x}/{y}@
   small_components = L.tileLayer('https://tools.geofabrik.de/osmi/tiles/routing_i/{z}/{x}/{y}.png', {});
 
 module.exports = {
+  apiKey: 'null',
   defaultState: {
     center: L.latLng(38.8995,-77.0269),
     zoom: 13,
